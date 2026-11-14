@@ -11,11 +11,18 @@ import {
   X,
   AlertCircle,
   ArrowRight,
+  Globe,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ISearchCriteria, ISearchJob } from '../types';
 import { NavTab } from '../components/Sidebar';
 import { LeadWorkspaceNav } from '../components/WorkspaceNav';
+import {
+  ALL_COUNTRY_NAMES,
+  getStatesForCountry,
+  getCitiesForState,
+} from '../data/locations';
 
 interface FindCompaniesProps {
   onNavigate: (tab: NavTab) => void;
@@ -69,9 +76,44 @@ export const FindCompanies: React.FC<FindCompaniesProps> = ({ onNavigate, onJobS
   const [category, setCategory] = useState('');
   const [keywordInput, setKeywordInput] = useState('');
   const [keywords, setKeywords] = useState<string[]>(['B2B software', 'automation']);
-  const [country, setCountry] = useState('United States');
-  const [region, setRegion] = useState('');
-  const [city, setCity] = useState('San Francisco');
+  const [country, setCountry] = useState('Pakistan');
+  const [region, setRegion] = useState('Punjab');
+  const [city, setCity] = useState('Faisalabad');
+  const [useManualLocation, setUseManualLocation] = useState(false);
+  const [customCountry, setCustomCountry] = useState('');
+  const [customRegion, setCustomRegion] = useState('');
+  const [customCity, setCustomCity] = useState('');
+
+  const availableStates = getStatesForCountry(country);
+  const availableCities = getCitiesForState(country, region);
+
+  const handleCountryChange = (newCountry: string) => {
+    setCountry(newCountry);
+    if (newCountry === '__custom__') {
+      setRegion('__custom__');
+      setCity('__custom__');
+    } else {
+      const states = getStatesForCountry(newCountry);
+      if (states.length > 0) {
+        setRegion(states[0].name);
+        const cities = states[0].cities;
+        setCity(cities.length > 0 ? cities[0] : '');
+      } else {
+        setRegion('');
+        setCity('');
+      }
+    }
+  };
+
+  const handleRegionChange = (newRegion: string) => {
+    setRegion(newRegion);
+    if (newRegion === '__custom__') {
+      setCity('__custom__');
+    } else {
+      const cities = getCitiesForState(country, newRegion);
+      setCity(cities.length > 0 ? cities[0] : '');
+    }
+  };
   const [companySize, setCompanySize] = useState('Unknown');
   const [serviceInput, setServiceInput] = useState('');
   const [services, setServices] = useState<string[]>(['Cloud Solutions']);
@@ -122,13 +164,31 @@ export const FindCompanies: React.FC<FindCompaniesProps> = ({ onNavigate, onJobS
 
     const targetIndustry = industry === 'Other' && customIndustry.trim() ? customIndustry.trim() : industry;
 
+    const resolvedCountry = useManualLocation
+      ? country.trim()
+      : country === '__custom__'
+        ? customCountry.trim()
+        : country;
+
+    const resolvedRegion = useManualLocation
+      ? region.trim()
+      : region === '__custom__'
+        ? customRegion.trim()
+        : region;
+
+    const resolvedCity = useManualLocation
+      ? city.trim()
+      : city === '__custom__'
+        ? customCity.trim()
+        : city;
+
     const payload: ISearchCriteria = {
       industry: targetIndustry,
       category,
       keywords,
-      country,
-      region,
-      city,
+      country: resolvedCountry,
+      region: resolvedRegion,
+      city: resolvedCity,
       companySize,
       services,
       aiRequirements: selectedAiRequirements,
@@ -535,45 +595,176 @@ export const FindCompanies: React.FC<FindCompaniesProps> = ({ onNavigate, onJobS
           </div>
         </div>
 
-        {/* Section C: Location */}
+        {/* Section C: Location (Cascading Dropdowns) */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 border-b border-border pb-2">
-            <MapPin className="w-4 h-4 text-accent" />
-            <h3 className="font-bold text-sm text-text">C. Location Criteria</h3>
+          <div className="flex items-center justify-between border-b border-border pb-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-accent" />
+              <h3 className="font-bold text-sm text-text">C. Location Criteria</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setUseManualLocation(!useManualLocation)}
+              className="text-xs text-accent hover:text-accent-hover font-semibold flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded-lg hover:bg-accent-soft/30"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>{useManualLocation ? 'Switch to Cascading Dropdowns' : 'Switch to Manual Typing'}</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Country</label>
-              <input
-                type="text"
-                placeholder="e.g. United States, Germany, United Kingdom"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
-              />
+          {useManualLocation ? (
+            /* Manual input mode */
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-text-secondary mb-1.5">Country</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Pakistan, United States, Germany"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-secondary mb-1.5">Region / State</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Punjab, California, Ontario"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-secondary mb-1.5">City</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Faisalabad, Lahore, Karachi, New York"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Region / State</label>
-              <input
-                type="text"
-                placeholder="e.g. California, Bavaria, Ontario"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
-              />
+          ) : (
+            /* Cascading dependent dropdown mode */
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 1. Country Dropdown */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1.5 flex items-center justify-between">
+                    <span>1. Country</span>
+                    <span className="text-[10px] text-accent font-medium">{ALL_COUNTRY_NAMES.length} Countries</span>
+                  </label>
+                  <select
+                    value={country}
+                    onChange={(e) => handleCountryChange(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text shadow-2xs font-medium cursor-pointer"
+                  >
+                    {ALL_COUNTRY_NAMES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                    <option value="__custom__">+ Other / Custom Country...</option>
+                  </select>
+
+                  {country === '__custom__' && (
+                    <input
+                      type="text"
+                      placeholder="Enter custom country"
+                      value={customCountry}
+                      onChange={(e) => setCustomCountry(e.target.value)}
+                      className="mt-2 w-full px-3 py-2 rounded-xl border border-accent/40 text-xs focus:ring-2 focus:ring-accent/20 bg-card text-text shadow-2xs"
+                    />
+                  )}
+                </div>
+
+                {/* 2. State / Province Dropdown */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1.5 flex items-center justify-between">
+                    <span>2. State / Province</span>
+                    <span className="text-[10px] text-muted font-medium">
+                      {availableStates.length > 0 ? `${availableStates.length} in ${country}` : 'None'}
+                    </span>
+                  </label>
+                  <select
+                    value={region}
+                    onChange={(e) => handleRegionChange(e.target.value)}
+                    disabled={country === '__custom__' || availableStates.length === 0}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text shadow-2xs font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <option value="">-- All States / Entire Country --</option>
+                    {availableStates.map((s) => (
+                      <option key={s.name} value={s.name}>
+                        {s.name}
+                      </option>
+                    ))}
+                    <option value="__custom__">+ Other / Custom State...</option>
+                  </select>
+
+                  {region === '__custom__' && (
+                    <input
+                      type="text"
+                      placeholder="Enter custom state / province"
+                      value={customRegion}
+                      onChange={(e) => setCustomRegion(e.target.value)}
+                      className="mt-2 w-full px-3 py-2 rounded-xl border border-accent/40 text-xs focus:ring-2 focus:ring-accent/20 bg-card text-text shadow-2xs"
+                    />
+                  )}
+                </div>
+
+                {/* 3. City Dropdown */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1.5 flex items-center justify-between">
+                    <span>3. City</span>
+                    <span className="text-[10px] text-muted font-medium">
+                      {availableCities.length > 0 ? `${availableCities.length} Cities in ${region || 'State'}` : 'Select State'}
+                    </span>
+                  </label>
+                  <select
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    disabled={region === '__custom__' || !region || availableCities.length === 0}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text shadow-2xs font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <option value="">-- All Cities in {region || 'State'} --</option>
+                    {availableCities.map((ct) => (
+                      <option key={ct} value={ct}>
+                        {ct}
+                      </option>
+                    ))}
+                    <option value="__custom__">+ Other / Custom City...</option>
+                  </select>
+
+                  {city === '__custom__' && (
+                    <input
+                      type="text"
+                      placeholder="Enter custom city name"
+                      value={customCity}
+                      onChange={(e) => setCustomCity(e.target.value)}
+                      className="mt-2 w-full px-3 py-2 rounded-xl border border-accent/40 text-xs focus:ring-2 focus:ring-accent/20 bg-card text-text shadow-2xs"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Active Selection Breadcrumb / Summary Badge */}
+              <div className="p-2.5 rounded-xl bg-accent-soft/40 border border-accent/15 flex flex-wrap items-center gap-2 text-xs text-text">
+                <span className="text-accent font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> Target Geo:
+                </span>
+                <span className="font-semibold text-text">
+                  {city && city !== '__custom__' ? `${city}, ` : customCity ? `${customCity}, ` : ''}
+                  {region && region !== '__custom__' ? `${region}, ` : customRegion ? `${customRegion}, ` : ''}
+                  {country && country !== '__custom__' ? country : customCountry || 'Worldwide'}
+                </span>
+                <span className="text-[11px] text-text-secondary ml-auto">
+                  ⚡ Pre-configured for Google Maps Scraper & Search Engines
+                </span>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">City</label>
-              <input
-                type="text"
-                placeholder="e.g. New York, Berlin, London"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border text-sm focus:ring-2 focus:ring-accent/20 focus:border-accent bg-card text-text placeholder:text-muted shadow-2xs"
-              />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Section D: Company Size & Business Services */}
