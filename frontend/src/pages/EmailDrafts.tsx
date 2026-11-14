@@ -392,7 +392,7 @@ export const EmailDrafts: React.FC<{
       </div>
 
       {/* Drafts List */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-xs">
         {loading ? (
           <div className="p-6">
             <TableSkeleton rows={8} />
@@ -415,7 +415,7 @@ export const EmailDrafts: React.FC<{
           <div>
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                <tr className="bg-surface border-b border-border text-text-secondary font-semibold">
                   <th className="p-3.5">Recipient & Company</th>
                   <th className="p-3.5">Subject Line</th>
                   <th className="p-3.5">Framework</th>
@@ -424,33 +424,47 @@ export const EmailDrafts: React.FC<{
                   <th className="p-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border/60">
                 {drafts.map((draft) => {
                   const contact = typeof draft.contactId === 'object' && draft.contactId !== null ? draft.contactId : ({} as any);
                   const company = typeof draft.companyId === 'object' && draft.companyId !== null ? draft.companyId : ({} as any);
+                  const contactName = contact.contactName || 'General Contact';
+                  const initials = contactName
+                    .split(' ')
+                    .map((n: string) => n[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
 
                   return (
-                    <tr key={draft._id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={draft._id} className="hover:bg-card-hover transition-colors">
                       <td className="p-3.5">
-                        <div className="font-semibold text-slate-900">
-                          {contact.contactName || 'General Contact'}
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-accent-soft text-accent flex items-center justify-center font-bold text-xs shrink-0">
+                            {initials || 'C'}
+                          </div>
+                          <div>
+                            <div className="font-bold text-text text-xs">
+                              {contactName}
+                            </div>
+                            <div className="text-[11px] text-text-secondary">
+                              {contact.jobTitle ? `${contact.jobTitle} • ` : ''}
+                              <span className="font-semibold text-text">{company.companyName || '—'}</span>
+                            </div>
+                            <div className="text-[10px] font-mono text-muted mt-0.5">{contact.email}</div>
+                          </div>
                         </div>
-                        <div className="text-[11px] text-slate-500">
-                          {contact.jobTitle ? `${contact.jobTitle} • ` : ''}
-                          <span className="font-medium text-slate-700">{company.companyName || '—'}</span>
-                        </div>
-                        <div className="text-[10px] font-mono text-slate-400 mt-0.5">{contact.email}</div>
                       </td>
                       <td className="p-3.5 max-w-xs">
-                        <div className="font-medium text-slate-800 truncate" title={draft.subject}>
+                        <div className="font-semibold text-text truncate" title={draft.subject}>
                           {draft.subject}
                         </div>
-                        <div className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                        <div className="text-[11px] text-text-secondary line-clamp-1 mt-0.5">
                           {draft.bodyText}
                         </div>
                       </td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-surface text-text-secondary border border-border shadow-2xs">
                           {getFrameworkLabel(draft.framework)}
                         </span>
                       </td>
@@ -480,7 +494,7 @@ export const EmailDrafts: React.FC<{
                                 setSendingDraftId(null);
                               }
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors shadow-xs disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-all shadow-xs disabled:opacity-50 cursor-pointer"
                             title="Send email immediately to your sandbox inbox"
                           >
                             {sendingDraftId === draft._id ? (
@@ -491,7 +505,7 @@ export const EmailDrafts: React.FC<{
                             ) : (
                               <>
                                 <Send className="w-3.5 h-3.5" />
-                                <span>Send Test Now</span>
+                                <span>Send Test</span>
                               </>
                             )}
                           </button>
@@ -499,14 +513,14 @@ export const EmailDrafts: React.FC<{
                         <button
                           type="button"
                           onClick={() => handleOpenReview(draft)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-[11px] transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-soft hover:bg-accent text-accent hover:text-on-accent font-semibold text-[11px] transition-all cursor-pointer shadow-2xs"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Review & Approve</span>
                         </button>
                         <button
                           onClick={() => handleDelete(draft._id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 transition-colors"
+                          className="p-1.5 rounded-lg text-muted hover:text-rose-600 transition-colors cursor-pointer"
                           title="Delete draft"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -519,30 +533,30 @@ export const EmailDrafts: React.FC<{
             </table>
 
             {/* Pagination */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+            <div className="px-6 py-4 bg-surface border-t border-border flex items-center justify-between text-xs text-text-secondary">
               <div>
-                Showing <span className="font-semibold text-slate-800">{(page - 1) * 12 + 1}</span> to{' '}
-                <span className="font-semibold text-slate-800">
+                Showing <span className="font-semibold text-text">{(page - 1) * 12 + 1}</span> to{' '}
+                <span className="font-semibold text-text">
                   {Math.min(page * 12, totalDrafts)}
                 </span>{' '}
-                of <span className="font-semibold text-slate-800">{totalDrafts}</span> drafts
+                of <span className="font-semibold text-text">{totalDrafts}</span> drafts
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(p - 1, 1))}
                   disabled={page <= 1}
-                  className="p-1.5 rounded border border-slate-200 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100"
+                  className="p-1.5 rounded-lg border border-border bg-card text-text disabled:opacity-40 disabled:cursor-not-allowed hover:bg-card-hover transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span>
+                <span className="font-medium text-text">
                   Page {page} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                   disabled={page >= totalPages}
-                  className="p-1.5 rounded border border-slate-200 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100"
+                  className="p-1.5 rounded-lg border border-border bg-card text-text disabled:opacity-40 disabled:cursor-not-allowed hover:bg-card-hover transition-colors cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -554,26 +568,26 @@ export const EmailDrafts: React.FC<{
 
       {/* Review & Edit Modal */}
       {isModalOpen && selectedDraft && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-card rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-border animate-in zoom-in-95 duration-150 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-5 border-b border-border bg-surface flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
+                <div className="w-10 h-10 rounded-xl bg-accent-soft border border-accent/20 flex items-center justify-center text-accent">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-slate-900">Review & Approve Outreach Draft</h3>
+                    <h3 className="text-base font-bold text-text">Review & Approve Outreach Draft</h3>
                     {getStatusBadge(selectedDraft.approvalStatus)}
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-text-secondary">
                     Recipient:{' '}
-                    <span className="font-semibold text-slate-700">
+                    <span className="font-semibold text-text">
                       {(selectedDraft.contactId as any)?.contactName || 'Prospect'}
                     </span>{' '}
                     ({(selectedDraft.contactId as any)?.email}) at{' '}
-                    <span className="font-semibold text-slate-700">
+                    <span className="font-semibold text-text">
                       {(selectedDraft.companyId as any)?.companyName}
                     </span>
                   </p>
@@ -581,19 +595,19 @@ export const EmailDrafts: React.FC<{
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 text-xl font-bold p-1"
+                className="text-muted hover:text-text text-xl font-bold p-1 rounded-lg hover:bg-card-hover transition-colors cursor-pointer"
               >
                 ×
               </button>
             </div>
 
             {/* Modal Body: Two Column Layout */}
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 bg-card">
               {/* Left Column: Editor & Subject Variants (2 Cols) */}
               <div className="lg:col-span-2 space-y-5">
                 {/* 3 AI Subject Options */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-text uppercase tracking-wider mb-2">
                     AI Subject Line Options (Select or Customize)
                   </label>
                   <div className="space-y-2">
@@ -603,22 +617,22 @@ export const EmailDrafts: React.FC<{
                         onClick={() => handleSelectVariant(opt, idx)}
                         className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2.5 ${
                           editedVariantIndex === idx
-                            ? 'bg-indigo-50/80 border-indigo-400 ring-1 ring-indigo-400'
-                            : 'bg-white border-slate-200 hover:border-slate-300'
+                            ? 'bg-accent-soft/30 border-accent ring-1 ring-accent'
+                            : 'bg-surface border-border hover:border-accent/40 hover:bg-card-hover'
                         }`}
                       >
                         <div
                           className={`w-4 h-4 rounded-full mt-0.5 flex items-center justify-center text-[10px] shrink-0 font-bold ${
                             editedVariantIndex === idx
-                              ? 'bg-indigo-600 text-white'
-                              : 'border border-slate-300 text-slate-400'
+                              ? 'bg-accent text-on-accent'
+                              : 'border border-border text-muted'
                           }`}
                         >
                           {idx + 1}
                         </div>
                         <div className="flex-1">
-                          <span className="font-medium text-slate-900">{opt}</span>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
+                          <span className="font-semibold text-text">{opt}</span>
+                          <div className="text-[10px] text-muted mt-0.5">
                             {idx === 0 ? 'Curiosity Angle' : idx === 1 ? 'Pain-Point Angle' : 'Observation Angle'}
                           </div>
                         </div>
@@ -629,29 +643,29 @@ export const EmailDrafts: React.FC<{
 
                 {/* Subject Editor */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-text uppercase tracking-wider mb-1">
                     Active Subject Line
                   </label>
                   <input
                     type="text"
                     value={editedSubject}
                     onChange={(e) => setEditedSubject(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3.5 py-2 border border-border rounded-xl text-xs font-semibold bg-surface text-text focus:ring-2 focus:ring-accent/20 focus:border-accent"
                   />
                 </div>
 
                 {/* Body Editor with Plain / HTML toggle */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    <label className="text-xs font-bold text-text uppercase tracking-wider">
                       Personalized Message Body
                     </label>
-                    <div className="flex border border-slate-200 rounded-md p-0.5 bg-slate-50 text-[10px]">
+                    <div className="flex border border-border rounded-lg p-0.5 bg-surface text-[10px]">
                       <button
                         type="button"
                         onClick={() => setViewMode('text')}
-                        className={`px-2 py-0.5 rounded font-semibold ${
-                          viewMode === 'text' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'
+                        className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                          viewMode === 'text' ? 'bg-card shadow-xs text-text font-bold' : 'text-text-secondary hover:text-text'
                         }`}
                       >
                         Plain Text
@@ -659,8 +673,8 @@ export const EmailDrafts: React.FC<{
                       <button
                         type="button"
                         onClick={() => setViewMode('html')}
-                        className={`px-2 py-0.5 rounded font-semibold ${
-                          viewMode === 'html' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500'
+                        className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                          viewMode === 'html' ? 'bg-card shadow-xs text-text font-bold' : 'text-text-secondary hover:text-text'
                         }`}
                       >
                         HTML Preview
@@ -673,11 +687,11 @@ export const EmailDrafts: React.FC<{
                       rows={10}
                       value={editedBodyText}
                       onChange={(e) => setEditedBodyText(e.target.value)}
-                      className="w-full p-3 border border-slate-300 rounded-xl text-xs font-mono leading-relaxed focus:ring-2 focus:ring-indigo-500"
+                      className="w-full p-3.5 border border-border rounded-xl text-xs font-mono leading-relaxed bg-surface text-text focus:ring-2 focus:ring-accent/20 focus:border-accent"
                     />
                   ) : (
                     <div
-                      className="p-4 border border-slate-200 rounded-xl bg-slate-50/50 text-xs text-slate-800 leading-relaxed max-h-72 overflow-y-auto prose prose-xs"
+                      className="p-4 border border-border rounded-xl bg-surface/50 text-xs text-text leading-relaxed max-h-72 overflow-y-auto prose prose-xs"
                       dangerouslySetInnerHTML={{ __html: selectedDraft.bodyHtml }}
                     />
                   )}
@@ -687,23 +701,23 @@ export const EmailDrafts: React.FC<{
               {/* Right Column: Grounded Evidence & Deliverability Audit */}
               <div className="space-y-5">
                 {/* Personalization Evidence Panel */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider">
+                <div className="bg-surface border border-border rounded-2xl p-4 space-y-3 shadow-2xs">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-text uppercase tracking-wider">
                     <Lightbulb className="w-4 h-4 text-amber-500" />
                     <span>Grounding Evidence (Phase 1)</span>
                   </div>
 
                   <div className="space-y-2 text-xs">
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Cybells Capability Matched:</span>
-                      <p className="font-semibold text-indigo-700">
+                      <span className="text-[10px] font-bold text-muted uppercase">Cybells Capability Matched:</span>
+                      <p className="font-semibold text-accent mt-0.5">
                         {selectedDraft.personalizationEvidence?.cybellsCapabilityUsed || 'General AI Automation'}
                       </p>
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Phase 1 Problems Targeted:</span>
-                      <ul className="list-disc list-inside space-y-1 text-slate-700 font-medium text-[11px] mt-1">
+                      <span className="text-[10px] font-bold text-muted uppercase">Phase 1 Problems Targeted:</span>
+                      <ul className="list-disc list-inside space-y-1 text-text-secondary font-medium text-[11px] mt-1">
                         {(selectedDraft.personalizationEvidence?.phase1ProblemsUsed || []).map((prob, i) => (
                           <li key={i}>{prob}</li>
                         ))}
@@ -711,8 +725,8 @@ export const EmailDrafts: React.FC<{
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Strategic Alignment:</span>
-                      <p className="text-slate-600 italic text-[11px] mt-0.5">
+                      <span className="text-[10px] font-bold text-muted uppercase">Strategic Alignment:</span>
+                      <p className="text-text-secondary italic text-[11px] mt-0.5 leading-relaxed">
                         "{selectedDraft.personalizationEvidence?.matchedReasoning}"
                       </p>
                     </div>
@@ -720,10 +734,10 @@ export const EmailDrafts: React.FC<{
                 </div>
 
                 {/* Spam Scorer & Deliverability Check */}
-                <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                <div className="bg-surface border border-border rounded-2xl p-4 space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider">
-                      <ShieldAlert className="w-4 h-4 text-indigo-600" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-text uppercase tracking-wider">
+                      <ShieldAlert className="w-4 h-4 text-accent" />
                       <span>Deliverability Audit</span>
                     </div>
                     {getSpamScoreBadge(selectedDraft.spamScore)}
@@ -736,7 +750,7 @@ export const EmailDrafts: React.FC<{
                         {selectedDraft.spamFlags.map((flag, idx) => (
                           <li
                             key={idx}
-                            className="text-[11px] text-rose-700 bg-rose-50 border border-rose-100 px-2 py-1 rounded"
+                            className="text-[11px] text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-lg"
                           >
                             • {flag}
                           </li>
@@ -744,21 +758,21 @@ export const EmailDrafts: React.FC<{
                       </ul>
                     </div>
                   ) : (
-                    <div className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-100 p-2.5 rounded-lg flex items-center gap-2">
+                    <div className="text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>Pristine email copy. No aggressive spam trigger phrases or formatting flags.</span>
                     </div>
                   )}
 
-                  <div className="pt-2 border-t border-slate-100 text-[10px] text-slate-400">
-                    Model: <span className="font-mono text-slate-600">{selectedDraft.geminiModel || 'gemini'}</span>
+                  <div className="pt-2 border-t border-border text-[10px] text-muted">
+                    Model: <span className="font-mono text-text font-medium">{selectedDraft.geminiModel || 'gemini'}</span>
                   </div>
                 </div>
 
                 {/* Unsubscribe & Postal Notice Warning */}
-                <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3 text-[11px] text-indigo-900 flex items-start gap-2">
-                  <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                  <p>
+                <div className="bg-accent-soft/30 border border-accent/20 rounded-2xl p-3 text-[11px] text-text flex items-start gap-2 shadow-2xs">
+                  <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                  <p className="text-text-secondary leading-relaxed">
                     Compliant one-click unsubscribe token and postal address are automatically injected into the footer
                     prior to dispatch.
                   </p>
@@ -767,12 +781,12 @@ export const EmailDrafts: React.FC<{
             </div>
 
             {/* Modal Footer: Action Buttons */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div className="p-4 border-t border-border bg-surface flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => handleUpdateStatus(selectedDraft._id, 'rejected', false)}
                 disabled={isSaving}
-                className="px-4 py-2 border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-semibold rounded-lg transition-colors"
+                className="px-4 py-2 border border-rose-500/30 text-rose-600 hover:bg-rose-500/10 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
               >
                 Reject Draft
               </button>
@@ -782,7 +796,7 @@ export const EmailDrafts: React.FC<{
                   type="button"
                   onClick={() => handleUpdateStatus(selectedDraft._id, 'draft', true)}
                   disabled={isSaving}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
+                  className="px-4 py-2 border border-border text-text-secondary hover:text-text hover:bg-card-hover text-xs font-semibold rounded-xl transition-colors shadow-2xs cursor-pointer"
                 >
                   Save Edits (Keep as Draft)
                 </button>
@@ -791,7 +805,7 @@ export const EmailDrafts: React.FC<{
                   type="button"
                   onClick={() => handleUpdateStatus(selectedDraft._id, 'approved', true)}
                   disabled={isSaving || !editedBodyText.trim() || editedBodyText.replace(/---\s*If you prefer[\s\S]*$/i, '').trim().length < 20}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 bg-accent hover:bg-accent-hover text-on-accent text-xs font-bold rounded-xl shadow-xs shadow-accent/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title={!editedBodyText.trim() ? "Cannot approve empty body" : "Approve for outreach"}
                 >
                   <Check className="w-4 h-4" />

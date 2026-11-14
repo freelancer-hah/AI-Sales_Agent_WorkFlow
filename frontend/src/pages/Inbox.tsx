@@ -23,6 +23,9 @@ import {
   Loader2,
   HelpCircle,
   Ban,
+  Link as LinkIcon,
+  PhoneCall,
+  Zap,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { IEmailReply, ReplyClassification } from '../types';
@@ -31,69 +34,78 @@ import { EmptyState } from '../components/EmptyState';
 
 const INTENT_CONFIG: Record<
   ReplyClassification,
-  { label: string; bg: string; text: string; border: string; desc: string }
+  { label: string; bg: string; text: string; border: string; desc: string; dot: string }
 > = {
   interested: {
     label: 'Interested',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
+    bg: 'bg-emerald-500/10',
+    text: 'text-emerald-700 dark:text-emerald-400',
+    border: 'border-emerald-500/20',
+    dot: 'bg-emerald-500',
     desc: 'Wants demo, call, or more details',
   },
   meeting_request: {
     label: 'Meeting Requested',
-    bg: 'bg-purple-50',
-    text: 'text-purple-700',
-    border: 'border-purple-200',
+    bg: 'bg-purple-500/10',
+    text: 'text-purple-700 dark:text-purple-400',
+    border: 'border-purple-500/20',
+    dot: 'bg-purple-500',
     desc: 'Asked to schedule a call / calendar',
   },
   price_inquiry: {
     label: 'Pricing Inquiry',
-    bg: 'bg-indigo-50',
-    text: 'text-indigo-700',
-    border: 'border-indigo-200',
+    bg: 'bg-indigo-500/10',
+    text: 'text-indigo-700 dark:text-indigo-400',
+    border: 'border-indigo-500/20',
+    dot: 'bg-indigo-500',
     desc: 'Asking for rates, costs, or quotes',
   },
   question: {
     label: 'Question',
-    bg: 'bg-sky-50',
-    text: 'text-sky-700',
-    border: 'border-sky-200',
+    bg: 'bg-sky-500/10',
+    text: 'text-sky-700 dark:text-sky-400',
+    border: 'border-sky-500/20',
+    dot: 'bg-sky-500',
     desc: 'Asking technical or workflow questions',
   },
   objection: {
     label: 'Objection / Timing',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    border: 'border-amber-200',
-    desc: 'Budget, timing, or internal team constraints',
+    bg: 'bg-amber-500/10',
+    text: 'text-amber-700 dark:text-amber-400',
+    border: 'border-amber-500/20',
+    dot: 'bg-amber-500',
+    desc: 'Budget, timing, or team constraints',
   },
   not_interested: {
     label: 'Not Interested',
-    bg: 'bg-slate-100',
-    text: 'text-slate-600',
-    border: 'border-slate-200',
+    bg: 'bg-zinc-500/10',
+    text: 'text-zinc-600 dark:text-zinc-400',
+    border: 'border-zinc-500/20',
+    dot: 'bg-zinc-400',
     desc: 'Politely or directly declined',
   },
   out_of_office: {
     label: 'Out of Office',
-    bg: 'bg-slate-100',
-    text: 'text-slate-500',
-    border: 'border-slate-200',
-    desc: 'Automated vacation or absence responder',
+    bg: 'bg-zinc-500/10',
+    text: 'text-zinc-500 dark:text-zinc-400',
+    border: 'border-zinc-500/20',
+    dot: 'bg-zinc-400',
+    desc: 'Automated absence responder',
   },
   unsubscribe: {
     label: 'Unsubscribe',
-    bg: 'bg-rose-50',
-    text: 'text-rose-700',
-    border: 'border-rose-200',
+    bg: 'bg-rose-500/10',
+    text: 'text-rose-700 dark:text-rose-400',
+    border: 'border-rose-500/20',
+    dot: 'bg-rose-500',
     desc: 'Requested opt-out (auto-suppressed)',
   },
   unclear: {
     label: 'Unclear',
-    bg: 'bg-slate-50',
-    text: 'text-slate-500',
-    border: 'border-slate-200',
+    bg: 'bg-zinc-500/10',
+    text: 'text-zinc-500 dark:text-zinc-400',
+    border: 'border-zinc-500/20',
+    dot: 'bg-zinc-400',
     desc: 'Ambiguous or blank reply',
   },
 };
@@ -339,26 +351,57 @@ export const Inbox: React.FC<{
     }
   };
 
+  const insertBookingSnippet = () => {
+    const snippet = `\n\nYou can easily book a convenient time directly on my calendar here:\nhttps://cal.com/abdulhannan-digitalsofts/30min\n\nLooking forward to speaking with you!`;
+    setReplyBody((prev) => prev.trim() + snippet);
+  };
+
+  const insertCallPitch = () => {
+    const pitch = `\n\nWould you be open to a quick 15-minute introductory call this week to see how this fits your workflow?`;
+    setReplyBody((prev) => prev.trim() + pitch);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Top Banner & Header */}
-      <div className="bg-gradient-to-br from-[#FFF1E6] via-[#FFF8F3] to-card rounded-2xl p-6 text-text shadow-xs border border-border">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-accent text-xs font-semibold uppercase tracking-wider">
-              <MessageSquare className="w-4 h-4 text-accent" />
-              <span>Phase 2: Engage Prospects</span>
+      {/* Modern Header Banner */}
+      <div className="bg-card rounded-2xl p-6 text-text shadow-xs border border-border">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider">
+              <span className="p-1 rounded-md bg-accent-soft text-accent">
+                <MessageSquare className="w-3.5 h-3.5" />
+              </span>
+              <span>Inbound Communications</span>
             </div>
-            <h2 className="text-xl font-bold text-text">Two-Way Inbox & Reply Intelligence</h2>
-            <p className="text-xs text-text-secondary max-w-xl">
-              Synchronize prospect replies via background IMAP, automatically classify buying sentiment with
-              Gemini AI, and review grounded responses before sending.
+            <h2 className="text-xl font-bold text-text tracking-tight">Two-Way Inbox & Reply Intelligence</h2>
+            <p className="text-xs text-text-secondary max-w-xl leading-relaxed">
+              Real-time synchronization with your mail server, automated buying intent classification via
+              Gemini AI, and grounded response suggestions before dispatch.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Quick Metrics Strip */}
+            <div className="flex items-center gap-2 bg-surface border border-border/80 px-3.5 py-2 rounded-xl text-xs shadow-2xs">
+              <div className="flex items-center gap-1.5 pr-2.5 border-r border-border/80">
+                <span className="w-2 h-2 rounded-full bg-accent" />
+                <span className="text-muted text-[11px]">Total:</span>
+                <span className="font-bold text-text">{stats.total}</span>
+              </div>
+              <div className="flex items-center gap-1.5 pr-2.5 border-r border-border/80">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-muted text-[11px]">Unread:</span>
+                <span className="font-bold text-amber-600">{stats.unreadCount}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="text-muted text-[11px]">Interested:</span>
+                <span className="font-bold text-emerald-600">{stats.interestedCount}</span>
+              </div>
+            </div>
+
             {/* IMAP Status Pill */}
-            <div className="bg-card border border-border px-3 py-2 rounded-xl text-xs space-y-0.5 shadow-2xs">
+            <div className="bg-surface border border-border/80 px-3 py-2 rounded-xl text-xs space-y-0.5 shadow-2xs">
               <div className="flex items-center gap-1.5 text-text text-[11px]">
                 <div
                   className={`w-2 h-2 rounded-full ${
@@ -371,7 +414,7 @@ export const Inbox: React.FC<{
               </div>
               <p className="text-[10px] text-muted">
                 {imapStatus?.syncState?.lastSyncAt
-                  ? `Last sync: ${new Date(imapStatus.syncState.lastSyncAt).toLocaleTimeString()}`
+                  ? `Synced: ${new Date(imapStatus.syncState.lastSyncAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                   : 'Ready to sync'}
               </p>
             </div>
@@ -380,10 +423,10 @@ export const Inbox: React.FC<{
             <button
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent shadow-xs shadow-accent/20 transition-all disabled:opacity-50 active:scale-98"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent shadow-xs shadow-accent/20 transition-all disabled:opacity-50 active:scale-98 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span>{isSyncing ? 'Syncing...' : 'Sync Inbox'}</span>
+              <span>{isSyncing ? 'Syncing...' : 'Sync Mailbox'}</span>
             </button>
           </div>
         </div>
@@ -392,23 +435,23 @@ export const Inbox: React.FC<{
       {/* Action Feedback Banner */}
       {feedback && (
         <div
-          className={`p-4 rounded-xl border flex items-center justify-between text-xs animate-in fade-in duration-200 ${
+          className={`p-3.5 rounded-xl border flex items-center justify-between text-xs animate-in fade-in duration-200 ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border-rose-200 text-rose-800'
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
+              : 'bg-rose-500/10 border-rose-500/20 text-rose-800 dark:text-rose-300'
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             {feedback.type === 'success' ? (
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             ) : (
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             )}
-            <span className="font-medium">{feedback.message}</span>
+            <span>{feedback.message}</span>
           </div>
           <button
             onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-600 font-bold ml-4"
+            className="text-muted hover:text-text font-bold ml-4 text-sm"
           >
             ×
           </button>
@@ -417,19 +460,19 @@ export const Inbox: React.FC<{
 
       {/* Main Split-Pane Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT PANE: Thread List (4 Columns) */}
-        <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col h-[740px]">
+        {/* LEFT PANE: Thread List (5 Columns) */}
+        <div className="lg:col-span-5 bg-card rounded-2xl border border-border overflow-hidden shadow-xs flex flex-col h-[740px]">
           {/* Search & Filter Bar */}
-          <div className="p-3.5 border-b border-slate-200 bg-slate-50/60 space-y-2.5">
+          <div className="p-3.5 border-b border-border bg-surface space-y-2.5">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search replies, sender, keywords..."
+                placeholder="Search conversations, keywords, sender..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && loadReplies()}
-                className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-border text-xs bg-card text-text placeholder:text-muted focus:ring-2 focus:ring-accent/20 focus:border-accent"
               />
             </div>
 
@@ -447,10 +490,10 @@ export const Inbox: React.FC<{
                 <button
                   key={f.id}
                   onClick={() => setActiveFilter(f.id)}
-                  className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer ${
                     activeFilter === f.id
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      ? 'bg-accent text-on-accent font-semibold shadow-xs'
+                      : 'bg-card text-text-secondary border border-border hover:bg-card-hover hover:text-text'
                   }`}
                 >
                   {f.label}
@@ -460,17 +503,17 @@ export const Inbox: React.FC<{
           </div>
 
           {/* List of Replies */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+          <div className="flex-1 overflow-y-auto divide-y divide-border/60">
             {loading ? (
               <div className="p-4 space-y-3">
                 <TableSkeleton rows={6} />
               </div>
             ) : replies.length === 0 ? (
-              <div className="p-8 text-center">
+              <div className="p-8 text-center my-auto">
                 <EmptyState
                   icon={InboxIcon}
-                  title="No Replies Found"
-                  description="No replies match the current filter. When prospects respond to cold campaigns, they will appear here automatically."
+                  title="No Inbound Messages"
+                  description="No replies match the current filter. When prospects respond to your cold emails, they appear here instantly."
                   actionLabel="Sync IMAP Mailbox"
                   onAction={handleManualSync}
                 />
@@ -479,33 +522,57 @@ export const Inbox: React.FC<{
               replies.map((reply) => {
                 const intent = INTENT_CONFIG[reply.classification] || INTENT_CONFIG.unclear;
                 const isSelected = selectedReply?._id === reply._id;
-                const companyName = reply.companyId?.companyName || 'Unknown Company';
+                const companyName = reply.companyId?.companyName || 'Lead Organization';
                 const senderDisplay =
                   reply.contactId?.contactName || reply.senderEmail.split('@')[0];
+                const initials = senderDisplay
+                  .split(' ')
+                  .map((n: string) => n[0])
+                  .join('')
+                  .substring(0, 2)
+                  .toUpperCase();
 
                 return (
                   <div
                     key={reply._id}
                     onClick={() => handleSelectReply(reply)}
-                    className={`p-3.5 cursor-pointer transition-colors text-left space-y-1.5 ${
+                    className={`p-3.5 cursor-pointer transition-all text-left space-y-1.5 ${
                       isSelected
-                        ? 'bg-indigo-50/70 border-l-4 border-l-indigo-600'
+                        ? 'bg-accent-soft/30 border-l-4 border-l-accent'
                         : !reply.isRead
-                        ? 'bg-slate-50/60 hover:bg-slate-100/70 font-medium'
-                        : 'hover:bg-slate-50'
+                        ? 'bg-surface font-medium hover:bg-card-hover'
+                        : 'hover:bg-surface/60'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 truncate">
-                        {!reply.isRead && (
-                          <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
-                        )}
-                        <span className="font-bold text-slate-900 text-xs truncate">
-                          {senderDisplay}
-                        </span>
-                        <span className="text-slate-400 text-[11px] truncate">({companyName})</span>
+                      <div className="flex items-center gap-2 truncate">
+                        {/* Avatar */}
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                            isSelected
+                              ? 'bg-accent text-on-accent'
+                              : 'bg-accent-soft text-accent'
+                          }`}
+                        >
+                          {initials || 'C'}
+                        </div>
+
+                        <div className="truncate">
+                          <div className="flex items-center gap-1.5">
+                            {!reply.isRead && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                            )}
+                            <span className="font-bold text-text text-xs truncate">
+                              {senderDisplay}
+                            </span>
+                          </div>
+                          <span className="text-muted text-[11px] truncate block">
+                            {companyName}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-slate-400 shrink-0">
+
+                      <span className="text-[10px] text-muted shrink-0 font-medium">
                         {new Date(reply.receivedAt).toLocaleDateString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -513,20 +580,21 @@ export const Inbox: React.FC<{
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-800 line-clamp-1 font-medium">{reply.subject}</p>
-                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-text font-semibold truncate pl-9">{reply.subject}</p>
+                    <p className="text-[11px] text-text-secondary line-clamp-2 leading-relaxed pl-9">
                       {reply.body}
                     </p>
 
-                    <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center justify-between pt-1 pl-9">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${intent.bg} ${intent.text} ${intent.border}`}
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${intent.bg} ${intent.text} ${intent.border}`}
                       >
-                        {intent.label}
+                        <span className={`w-1.5 h-1.5 rounded-full ${intent.dot}`} />
+                        <span>{intent.label}</span>
                       </span>
 
                       {reply.reviewedAt && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
                           <Check className="w-3 h-3" />
                           <span>Reviewed</span>
                         </span>
@@ -540,38 +608,38 @@ export const Inbox: React.FC<{
         </div>
 
         {/* RIGHT PANE: Conversation & Response Workspace (7 Columns) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col h-[740px]">
+        <div className="lg:col-span-7 bg-card rounded-2xl border border-border overflow-hidden shadow-xs flex flex-col h-[740px]">
           {!selectedReply ? (
-            <div className="h-full flex items-center justify-center p-8 text-center">
-              <div className="space-y-2 max-w-sm">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+            <div className="h-full flex items-center justify-center p-8 text-center my-auto">
+              <div className="space-y-3 max-w-sm">
+                <div className="w-12 h-12 rounded-2xl bg-accent-soft text-accent flex items-center justify-center mx-auto">
                   <InboxIcon className="w-6 h-6" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-800">No Conversation Selected</h3>
-                <p className="text-xs text-slate-500">
-                  Select a prospect reply from the left panel to view thread history, inspect AI
-                  intent classifications, and dispatch a grounded reply.
+                <h3 className="text-sm font-bold text-text">No Conversation Selected</h3>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Select a prospect reply from the left panel to inspect the email thread, review Gemini
+                  buying signals, and dispatch a grounded reply.
                 </p>
               </div>
             </div>
           ) : (
             <>
               {/* Thread Header */}
-              <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-slate-900">
+                    <h3 className="text-sm font-bold text-text">
                       {selectedReply.contactId?.contactName || selectedReply.senderEmail}
                     </h3>
                     {selectedReply.contactId?.jobTitle && (
-                      <span className="text-xs text-slate-500 font-medium">
+                      <span className="text-xs text-text-secondary font-medium">
                         — {selectedReply.contactId.jobTitle}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="font-medium text-slate-700">
+                  <div className="flex items-center gap-2 text-xs text-text-secondary flex-wrap">
+                    <Building2 className="w-3.5 h-3.5 text-muted" />
+                    <span className="font-semibold text-text">
                       {selectedReply.companyId?.companyName || 'External Organization'}
                     </span>
                     {selectedReply.companyId?.website && (
@@ -579,14 +647,14 @@ export const Inbox: React.FC<{
                         href={selectedReply.companyId.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-indigo-600 hover:underline flex items-center gap-0.5"
+                        className="text-accent hover:underline flex items-center gap-0.5"
                       >
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                     <span>•</span>
-                    <Mail className="w-3 h-3 text-slate-400" />
-                    <span>{selectedReply.senderEmail}</span>
+                    <Mail className="w-3 h-3 text-muted" />
+                    <span className="font-mono text-[11px]">{selectedReply.senderEmail}</span>
                   </div>
                 </div>
 
@@ -594,32 +662,32 @@ export const Inbox: React.FC<{
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={handleStartQualificationFromReply}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
                     title="Send to Phase 3 Lead Qualification Pipeline"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Qualify in Phase 3</span>
+                    <span>Qualify Lead</span>
                   </button>
 
                   {onNavigateToMeetings && (
                     <button
                       onClick={onNavigateToMeetings}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface hover:bg-card-hover border border-border text-text rounded-xl text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                       title="Schedule Meeting in Phase 4"
                     >
-                      <Calendar className="w-3.5 h-3.5" />
+                      <Calendar className="w-3.5 h-3.5 text-accent" />
                       <span>Book Meeting</span>
                     </button>
                   )}
 
-                  <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200">
-                    <label className="text-[11px] text-slate-500 font-medium">Intent:</label>
+                  <div className="flex items-center gap-1.5 pl-2 border-l border-border">
+                    <label className="text-[11px] text-muted font-medium">Intent:</label>
                     <select
                       value={selectedReply.classification}
                       onChange={(e) =>
                         handleClassificationChange(e.target.value as ReplyClassification)
                       }
-                      className="text-xs font-semibold px-2 py-1 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500"
+                      className="text-xs font-semibold px-2 py-1 rounded-lg border border-border bg-card text-text focus:ring-2 focus:ring-accent/20 cursor-pointer shadow-2xs"
                     >
                       {Object.keys(INTENT_CONFIG).map((key) => (
                         <option key={key} value={key}>
@@ -632,7 +700,7 @@ export const Inbox: React.FC<{
               </div>
 
               {/* Conversation History Stream */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/30">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-surface/40">
                 {loadingDetails ? (
                   <div className="space-y-3">
                     <TableSkeleton rows={4} />
@@ -644,15 +712,15 @@ export const Inbox: React.FC<{
                       .filter((m) => m.direction === 'outbound')
                       .map((msg, idx) => (
                         <div key={idx} className="flex justify-end">
-                          <div className="max-w-lg bg-indigo-600 text-white rounded-2xl rounded-tr-xs p-3.5 shadow-xs space-y-1 text-xs">
-                            <div className="flex items-center justify-between gap-4 text-[10px] text-indigo-200 border-b border-indigo-500/50 pb-1 mb-1">
-                              <span>Sent by You ({msg.senderEmail})</span>
+                          <div className="max-w-lg bg-card border border-border/80 rounded-2xl rounded-tr-xs p-4 shadow-2xs space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between gap-4 text-[10px] text-muted border-b border-border/60 pb-1 mb-1">
+                              <span className="font-semibold text-accent">Sent by You (Outreach)</span>
                               <span>
-                                {msg.sentAt ? new Date(msg.sentAt).toLocaleString() : 'Outreach'}
+                                {msg.sentAt ? new Date(msg.sentAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Outreach'}
                               </span>
                             </div>
-                            <p className="font-semibold">{msg.subject}</p>
-                            <p className="whitespace-pre-line leading-relaxed text-indigo-50">
+                            <p className="font-bold text-text">{msg.subject}</p>
+                            <p className="whitespace-pre-line leading-relaxed text-text-secondary font-sans">
                               {msg.bodyText}
                             </p>
                           </div>
@@ -661,19 +729,19 @@ export const Inbox: React.FC<{
 
                     {/* Incoming Prospect Reply Bubble */}
                     <div className="flex justify-start">
-                      <div className="max-w-xl bg-white border border-slate-200 rounded-2xl rounded-tl-xs p-4 shadow-sm space-y-2 text-xs">
-                        <div className="flex items-center justify-between gap-4 text-[10px] text-slate-500 border-b border-slate-100 pb-1.5">
+                      <div className="max-w-xl bg-card border border-accent/20 rounded-2xl rounded-tl-xs p-4 shadow-xs space-y-2 text-xs">
+                        <div className="flex items-center justify-between gap-4 text-[10px] text-muted border-b border-border pb-1.5">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-slate-800">
+                            <span className="font-bold text-text">
                               {selectedReply.senderEmail}
                             </span>
-                            <span>(Prospect Reply)</span>
+                            <span className="text-accent font-semibold">(Prospect Inbound)</span>
                           </div>
-                          <span>{new Date(selectedReply.receivedAt).toLocaleString()}</span>
+                          <span>{new Date(selectedReply.receivedAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
                         </div>
 
-                        <p className="font-bold text-slate-900">{selectedReply.subject}</p>
-                        <p className="whitespace-pre-line leading-relaxed text-slate-700 bg-slate-50/60 p-3 rounded-xl border border-slate-100 font-sans">
+                        <p className="font-bold text-text">{selectedReply.subject}</p>
+                        <p className="whitespace-pre-line leading-relaxed text-text bg-surface/80 p-3.5 rounded-xl border border-border/80 font-sans">
                           {selectedReply.body}
                         </p>
                       </div>
@@ -683,30 +751,55 @@ export const Inbox: React.FC<{
               </div>
 
               {/* Grounded AI Response Editor Workspace */}
-              <div className="border-t border-slate-200 p-4 bg-white space-y-3">
-                <div className="flex items-center justify-between">
+              <div className="border-t border-border p-4 bg-card space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <div className="p-1.5 bg-accent-soft text-accent rounded-lg">
                       <Sparkles className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900">
-                        AI Suggested Response (Cybells Grounded)
+                      <h4 className="text-xs font-bold text-text flex items-center gap-2">
+                        <span>AI Suggested Response</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-accent-soft text-accent font-normal">
+                          Grounded in Cybells Knowledge Base
+                        </span>
                       </h4>
-                      <p className="text-[10px] text-slate-500">
-                        Human approval mandatory. Answers are grounded in Cybells Knowledge Base.
+                      <p className="text-[10px] text-muted">
+                        Human approval gate active. Customize freely before sending.
                       </p>
                     </div>
                   </div>
 
-                  <button
-                    onClick={handleRegenerateSuggestedReply}
-                    disabled={isRegenerating}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
-                    <span>Regenerate</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={insertBookingSnippet}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent hover:text-accent-hover bg-accent-soft/50 hover:bg-accent-soft px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      title="Insert your Cal.com scheduling URL"
+                    >
+                      <LinkIcon className="w-3 h-3" />
+                      <span>+ Cal Booking Link</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={insertCallPitch}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-secondary hover:text-text bg-surface hover:bg-card-hover border border-border px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      title="Insert a polite 15-minute call request"
+                    >
+                      <PhoneCall className="w-3 h-3" />
+                      <span>+ Pitch 15-Min Call</span>
+                    </button>
+
+                    <button
+                      onClick={handleRegenerateSuggestedReply}
+                      disabled={isRegenerating}
+                      className="flex items-center gap-1 text-[11px] font-semibold text-text-secondary hover:text-text bg-surface hover:bg-card-hover border border-border px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                      <span>Regenerate</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -714,29 +807,29 @@ export const Inbox: React.FC<{
                     type="text"
                     value={replySubject}
                     onChange={(e) => setReplySubject(e.target.value)}
-                    placeholder="Subject..."
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Subject line..."
+                    className="w-full px-3 py-1.5 rounded-xl border border-border text-xs font-semibold bg-surface text-text focus:ring-2 focus:ring-accent/20 focus:border-accent"
                   />
                   <textarea
                     rows={4}
                     value={replyBody}
                     onChange={(e) => setReplyBody(e.target.value)}
-                    placeholder="Type or edit your response..."
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-sans leading-relaxed focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Type or customize your response..."
+                    className="w-full px-3 py-2 rounded-xl border border-border text-xs font-sans leading-relaxed bg-surface text-text focus:ring-2 focus:ring-accent/20 focus:border-accent"
                   />
                 </div>
 
-                <div className="flex items-center justify-between pt-1">
-                  <div className="text-[11px] text-slate-400">
-                    Outbound transport: <span className="font-semibold text-slate-700">SMTP</span>{' '}
-                    (Sandbox Guard Active)
+                <div className="flex items-center justify-between pt-1 flex-wrap gap-2">
+                  <div className="text-[11px] text-muted flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span>Outbound transport: <strong className="text-text font-mono text-[10px]">SMTP Active</strong> (Sandbox Safe)</span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleSendApprovedReply}
                       disabled={isSending || !replyBody.trim()}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent shadow-xs shadow-accent/20 transition-all disabled:opacity-50 active:scale-98 cursor-pointer"
                     >
                       {isSending ? (
                         <>
@@ -760,4 +853,3 @@ export const Inbox: React.FC<{
     </div>
   );
 };
-
