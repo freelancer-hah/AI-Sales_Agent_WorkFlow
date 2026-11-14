@@ -29,10 +29,10 @@ export const CalBookingModal: React.FC<CalBookingModalProps> = ({
     eventSlug: string;
     defaultCalLink: string;
   }>({
-    calOrigin: 'http://localhost:3000',
-    closerSlug: 'hafiz',
+    calOrigin: 'https://cal.com',
+    closerSlug: 'abdulhannan-digitalsofts',
     eventSlug: '30min',
-    defaultCalLink: 'hafiz/30min',
+    defaultCalLink: 'abdulhannan-digitalsofts/30min',
   });
 
   const [bookingSuccess, setBookingSuccess] = useState(false);

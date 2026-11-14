@@ -17,11 +17,12 @@ export class BookingLinkService {
    * Generates a fully qualified Cal.diy URL with pre-filled name, email, and company notes
    */
   public generatePersonalizedUrl(params: BookingLinkParams = {}): string {
-    const baseUrl = (env.CAL_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '');
-    const closer = params.closerSlug || env.CAL_CLOSER_SLUG || 'hafiz';
-    const event = params.eventSlug || env.CAL_EVENT_SLUG || '30min';
+    const baseUrl = (env.CAL_BASE_URL || 'https://cal.com').replace(/\/+$/, '');
+    const closer = params.closerSlug || env.CAL_CLOSER_SLUG || 'abdulhannan-digitalsofts';
+    const event = params.eventSlug !== undefined ? params.eventSlug : (env.CAL_EVENT_SLUG || '30min');
 
-    const url = new URL(`${baseUrl}/${closer}/${event}`);
+    const path = event ? `${closer}/${event}` : closer;
+    const url = new URL(`${baseUrl}/${path}`);
 
     if (params.name?.trim()) {
       url.searchParams.set('name', params.name.trim());
@@ -48,11 +49,13 @@ export class BookingLinkService {
    * Returns base Cal configuration for frontend embeds
    */
   public getEmbedConfig() {
+    const closer = env.CAL_CLOSER_SLUG || 'abdulhannan-digitalsofts';
+    const event = env.CAL_EVENT_SLUG || '30min';
     return {
-      calOrigin: (env.CAL_BASE_URL || 'http://localhost:3000').replace(/\/+$/, ''),
-      closerSlug: env.CAL_CLOSER_SLUG || 'hafiz',
-      eventSlug: env.CAL_EVENT_SLUG || '30min',
-      defaultCalLink: `${env.CAL_CLOSER_SLUG || 'hafiz'}/${env.CAL_EVENT_SLUG || '30min'}`,
+      calOrigin: (env.CAL_BASE_URL || 'https://cal.com').replace(/\/+$/, ''),
+      closerSlug: closer,
+      eventSlug: event,
+      defaultCalLink: event ? `${closer}/${event}` : closer,
     };
   }
 }
