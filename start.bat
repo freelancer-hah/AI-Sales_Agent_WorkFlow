@@ -8,7 +8,7 @@ echo.
 echo [1/3] Starting Python Scraper Microservice (Port 8000)...
 start "1. Python Scraper Service" cmd /k "cd /d "%~dp0scraper" && python main.py"
 
-echo [2/3] Starting Express Backend API (Port 5000)...
+echo [2/3] Starting Express Backend API (Port 5003)...
 start "2. Node.js Backend API" cmd /k "cd /d "%~dp0backend" && npm run dev"
 
 echo [3/3] Starting React Frontend Dashboard (Port 5173)...
@@ -18,10 +18,11 @@ echo.
 echo ========================================================
 echo   All 3 services have been launched in separate windows!
 echo ========================================================
-echo   - Frontend SaaS UI:    http://localhost:5173
-echo   - Backend API Health:   http://localhost:5000/api/health
-echo   - Scraper Health:       http://localhost:8000/health
-echo   - SearXNG Search (Opt): http://localhost:8088 (Run start-searxng.bat)
+echo   - Frontend SaaS UI:        http://localhost:5173
+echo   - Backend API Health:       http://localhost:5003/api/health
+echo   - Scraper Microservice:     http://localhost:8000/health
+echo   - Google Maps Scraper:      http://localhost:8085 (Docker)
+echo   - Cal.com Live Scheduler:   https://cal.com/abdulhannan-digitalsofts
 echo ========================================================
 echo.
 echo You can open your browser at: http://localhost:5173
