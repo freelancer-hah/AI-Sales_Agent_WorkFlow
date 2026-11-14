@@ -12,3 +12,17 @@ services:
     environment:
       - SEARXNG_BASE_URL=http://localhost:8080/
     restart: unless-stopped
+
+  gmaps-scraper:
+    image: gosom/google-maps-scraper:latest
+    container_name: sales-agent-gmaps-scraper
+    command: -data-folder /gmapsdata
+    ports:
+      - "8085:8080"
+    volumes:
+      - gmaps_data:/gmapsdata
+    restart: unless-stopped
+
+volumes:
+  gmaps_data:
+
