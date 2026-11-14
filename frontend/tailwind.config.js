@@ -1,0 +1,50 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        bg: 'var(--bg)',
+        sidebar: 'var(--sidebar)',
+        card: 'var(--card)',
+        'card-hover': 'var(--card-hover)',
+        border: 'var(--border)',
+        text: 'var(--text)',
+        'text-secondary': 'var(--text-secondary)',
+        muted: 'var(--muted)',
+        accent: 'var(--accent)',
+        'accent-hover': 'var(--accent-hover)',
+        'accent-mid': 'var(--accent-mid)',
+        'accent-light': 'var(--accent-light)',
+        'accent-faint': 'var(--accent-faint)',
+        'accent-soft': 'var(--accent-soft)',
+        track: 'var(--track)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
+        'on-accent': 'var(--on-accent)',
+        brand: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          950: '#431407',
+        },
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+    },
+  },
+  plugins: [],
+}

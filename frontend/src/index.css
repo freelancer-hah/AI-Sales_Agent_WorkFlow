@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Warm Luxury CRM Color Palette (From Reference) */
+  --bg: #FAF8F5;
+  --sidebar: #F3EFE9;
+  --card: #FFFFFF;
+  --card-hover: #FFFCF8;
+  --border: #E8E2D9;
+  --text: #1C1917;
+  --text-secondary: #57534E;
+  --muted: #78716C;
+  --accent: #C2410C;
+  --accent-hover: #9A3412;
+  --accent-mid: #EA580C;
+  --accent-light: #FDBA74;
+  --accent-faint: #FED7AA;
+  --accent-soft: rgba(194, 65, 12, 0.10);
+  --track: #EEE8DF;
+  --success: #15803D;
+  --warning: #B45309;
+  --danger: #B91C1C;
+  --on-accent: #FFFFFF;
+
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.06);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  input, select, textarea, button {
+    @apply transition-colors duration-150 ease-in-out;
+  }
+}
+
+/* Warm Card Hover & Surface Effects */
+.card-hover {
+  @apply transition-all duration-200 ease-in-out hover:shadow-sm hover:border-[#D6CEBE];
+}
+
+/* Glassmorphic TopBar Header */
+.glass-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.04);
+  transition: all 200ms ease;
+}
+
+.glass-panel:hover {
+  border-color: #D6CEBE;
+  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.06);
+}
+
+/* Custom Warm Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6CEBE;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8AC99;
+}
+
+/* Slide-in & Fade animation helpers */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

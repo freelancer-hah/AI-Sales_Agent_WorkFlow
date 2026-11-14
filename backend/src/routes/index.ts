@@ -1,0 +1,43 @@
+import { Router } from 'express';
+import healthRoutes from './healthRoutes.js';
+import dashboardRoutes from './dashboardRoutes.js';
+import companyRoutes from './companyRoutes.js';
+import decisionMakerRoutes from './decisionMakerRoutes.js';
+import searchRoutes from './searchRoutes.js';
+import aiRoutes from './aiRoutes.js';
+import scrapeRoutes from './scrapeRoutes.js';
+import exportRoutes from './exportRoutes.js';
+import settingsRoutes from './settingsRoutes.js';
+import cybellsRoutes from './cybellsRoutes.js';
+import outreachRoutes from './outreachRoutes.js';
+import campaignRoutes from './campaignRoutes.js';
+import suppressionRoutes from './suppressionRoutes.js';
+import unsubscribeRoutes from './unsubscribeRoutes.js';
+import replyRoutes from './replyRoutes.js';
+import qualificationRoutes from './qualificationRoutes.js';
+import meetingRoutes from './meetingRoutes.js';
+import { webhookRouter } from './webhookRoutes.js';
+
+const router = Router();
+
+router.use('/health', healthRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/companies', companyRoutes);
+router.use('/companies/export', exportRoutes);
+router.use('/export', exportRoutes);
+router.use('/decision-makers', decisionMakerRoutes);
+router.use('/search', searchRoutes);
+router.use('/ai', aiRoutes);
+router.use('/scrape', scrapeRoutes);
+router.use('/settings', settingsRoutes);
+router.use('/cybells', cybellsRoutes);
+router.use('/outreach', outreachRoutes);
+router.use('/campaigns', campaignRoutes);
+router.use('/suppression', suppressionRoutes);
+router.use('/unsubscribe', unsubscribeRoutes);
+router.use('/replies', replyRoutes);
+router.use('/qualifications', qualificationRoutes);
+router.use('/meetings', meetingRoutes);
+router.use('/webhooks', webhookRouter);
+
+export default router;
