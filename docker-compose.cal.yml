@@ -1,27 +1,27 @@
-# Docker Compose for Cal.diy (100% MIT-Licensed Self-Hosted Scheduling)
+# Docker Compose for Cal.com (Self-Hosted Scheduling Engine)
 # Run with: docker compose -f docker-compose.cal.yml up -d
-version: '3.8'
-
 services:
   calcom:
-    image: calcom/cal.diy:latest
+    image: calcom/cal.com:latest
     container_name: cal_diy_app
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - DATABASE_URL=postgresql://calcom:calcom_secret@calcom-postgres:5432/calcom
+      - DATABASE_DIRECT_URL=postgresql://calcom:calcom_secret@calcom-postgres:5432/calcom
       - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
       - NEXTAUTH_SECRET=cybells_super_secret_nextauth_cal_key_998877
       - CALENDSO_ENCRYPTION_KEY=12345678901234567890123456789012
       - CAL_WEBHOOK_SECRET=cal_webhook_secret_cybells_2026
     depends_on:
-      - calcom-postgres
+      calcom-postgres:
+        condition: service_healthy
     networks:
       - sales_network
 
   calcom-postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: cal_diy_db
     restart: unless-stopped
     ports:
@@ -32,6 +32,11 @@ services:
       - POSTGRES_DB=calcom
     volumes:
       - calcom_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calcom -d calcom"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - sales_network
 
@@ -42,4 +47,3 @@ networks:
   sales_network:
     name: sales_network
     driver: bridge
-
